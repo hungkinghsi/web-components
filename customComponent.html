@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>哇哈哈的组件</title>
+	</head>
+	<body>
+		<style type="text/css">
+			#modalBtn {
+			  background: tomato;
+			  border-radius: 2ch;
+			  color: #fff;
+			  padding: 5ch 3ch;
+			  position: static;
+			}
+		</style>
+		<wa-haha></wa-haha>
+		<template id="wahaha-template">
+		  <style>
+		    .wrapper {
+		      opacity: 0;
+		      transition: visibility 0s, opacity 0.25s ease-in;
+		    }
+		    .wrapper:not(.open) {
+		      visibility: hidden;
+		    }
+		    .wrapper.open {
+		      align-items: center;
+		      display: flex;
+		      justify-content: center;
+		      height: 100vh;
+		      position: fixed;
+		        top: 0;
+		        left: 0;
+		        right: 0;
+		        bottom: 0;
+		      opacity: 1;
+		      visibility: visible;
+		    }
+		    .overlay {
+		      background: rgba(0, 0, 0, 0.8);
+		      height: 100%;
+		      position: fixed;
+		        top: 0;
+		        right: 0;
+		        bottom: 0;
+		        left: 0;
+		      width: 100%;
+		    }
+		    .dialog {
+		      background: #ffffff;
+		      max-width: 800px;
+		      padding: 1rem;
+		      position: fixed;
+			  border-radius: 20px;
+		    }
+		    button {
+		      all: unset;
+		      cursor: pointer;
+		      font-size: 1.25rem;
+		      position: absolute;
+		        top: 1rem;
+		        right: 1rem;
+		    }
+			
+			button{
+				box-sizing: border-box;
+			}
+			
+			button:focus{
+				border: none;
+			}
+			button:hover{
+				border: 1px solid #1E9BF9;
+			}
+		  </style>
+		  <div class="wrapper">
+		  <div class="overlay"></div>
+		    <div class="dialog" role="dialog" aria-labelledby="title" aria-describedby="content">
+		      <button class="close" aria-label="Close">叉️</button>
+		      <h1 id="title">Hello Indeex</h1>
+		      <div id="content" class="content">
+		        <p>哇哈哈的模态窗</p>
+		      </div>
+		    </div>
+		  </div>
+		</template>
+		
+		<button id="modalBtn">假装是个编辑按钮</button>
+		
+		<script type="text/javascript">
+			class WaHaha extends HTMLElement {
+			  static get observedAttributes() {
+			    return ['open'];
+			  }
+			  
+			  constructor() {
+			    super();
+			    this.close = this.close.bind(this);
+			    this._watchEscape = this._watchEscape.bind(this);
+			  }
+			  
+			  attributeChangedCallback(attrName, oldValue, newValue) {
+			    if (oldValue !== newValue) {
+			      this[attrName] = this.hasAttribute(attrName);
+			    }
+			  }
+			  
+			  connectedCallback() {
+			    const template = document.getElementById('wahaha-template');
+			    const node = document.importNode(template.content, true);
+			    this.appendChild(node);
+			    
+			    
+			    this.querySelector('button').addEventListener('click', this.close);
+			    this.querySelector('.overlay').addEventListener('click', this.close);
+			    this.open = this.open;
+			  }
+			  
+			  disconnectedCallback() {
+			    this.querySelector('button').removeEventListener('click', this.close);
+			    this.querySelector('.overlay').removeEventListener('click', this.close);
+			  }
+			  
+			  
+			  get open() {
+			    return this.hasAttribute('open');
+			  }
+			  
+			  
+			set open(isOpen) {
+			    this.querySelector('.wrapper').classList.toggle('open', isOpen);
+			    this.querySelector('.wrapper').setAttribute('aria-hidden', !isOpen);
+			    if (isOpen) {
+			      this._wasFocused = document.activeElement;
+			      this.setAttribute('open', '');
+			      document.addEventListener('keydown', this._watchEscape);
+			      this.focus();
+			      this.querySelector('button').focus();
+			    } else {
+			      this._wasFocused && this._wasFocused.focus && this._wasFocused.focus();
+			      this.removeAttribute('open');
+			      document.removeEventListener('keydown', this._watchEscape);
+			      this.close();
+			    }
+			  }
+			  
+			  
+			  close() {
+			    if (this.open !== false) {
+			      this.open = false;
+			    }
+			    const closeEvent = new CustomEvent('wahaha-closed');
+			    this.dispatchEvent(closeEvent);
+			  }
+			  
+			  _watchEscape(event) {
+			    if (event.key === 'Escape') {
+			        this.close();   
+			    }
+			  }
+			}
+			
+			customElements.define('wa-haha', WaHaha);
+			
+			const button = document.getElementById('modalBtn');
+			button.addEventListener('click', () => {
+			  document.querySelector('wa-haha').open = true;
+			})
+		</script>
+	</body>
+</html>
