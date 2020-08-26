@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<style type="text/css">
+			header {
+			  background: red;
+			}
+			
+			h2 {
+			  color: red;
+			}
+			.module {
+			  border: 1px solid red;
+			}
+		</style>
+		<i-header></i-header>
+		
+		<i-module>
+		  <h2 slot="header">Indeex Moduleeeeeeeee</h2>
+		</i-module>
+		
+		<script type="text/javascript">
+			class IHeader extends HTMLElement {
+			  
+			  constructor() {
+			    super();
+			    
+			    const headerTemplate = document.createElement('template');
+			    headerTemplate.innerHTML = `
+			      <style>
+			        header {
+			          background: #861d1d;
+			          color: white;
+			          padding: 4ch;
+			        }
+			      </style>
+			      <header>
+			        WaOoooo Indeex Header Navvvvvvvv....
+			      </header>
+			    `;
+			    this.attachShadow({mode: 'open'});
+			    this.shadowRoot.appendChild(headerTemplate.content.cloneNode(true));
+			  }
+			  
+			}
+			
+			class IModule extends HTMLElement {
+			  
+			  constructor() {
+			    super();
+			    
+			    const moduleTemplate = document.createElement('template');
+			    moduleTemplate.innerHTML = `
+			      <style>
+			        .module {
+						min-height: 60vh;
+			           padding: 4ch;
+			           background: pink;
+			        }
+			      </style>
+			      <div class="module">
+			        <slot name="header"></slot>
+			      </div>
+			    `;
+			    this.attachShadow({mode: 'open'});
+			    this.shadowRoot.appendChild(moduleTemplate.content.cloneNode(true));
+			  }
+			  
+			}
+			
+			customElements.define('i-header', IHeader);
+			customElements.define('i-module', IModule);
+		</script>
+	</body>
+</html>
